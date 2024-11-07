@@ -1,8 +1,13 @@
 import flet as ft
+import requests
 from flet_route import Params, Basket
-
+from src.Api.auth import Auth
+import asyncio
 
 class LoginPage:
+
+
+
     def view(self, page:ft.page, params:Params, basket:Basket):
         def btn_click(txt_name: ft.TextField, password: ft.TextField):
             if not txt_name.value:
@@ -15,9 +20,26 @@ class LoginPage:
                 txt_name.error_text = None
                 password.error_text = None
                 page.update()
-                login = txt_name.value
-                passwd = password.value
-                page.go('/dashboard')
+                auth_client = Auth(token="")
+
+                try:
+                    result = auth_client.login(
+                        login=txt_name.value,
+                        password=password.value
+                    )
+
+                    if result['status'] == 200:
+
+                        auth_client.token = token
+                        page.go('/dashboard')
+                    else:
+                        password.error_text = result['body'].get("detail", "Ошибка")
+                        page.update()
+
+                except Exception as e:
+                    # Handle unexpected exceptions, e.g., network issues, server errors, etc.
+                    password.error_text = f"Произошла ошибка: {str(e)}"
+                    page.update()
 
         page.window.width = 1200
         page.window.height = 700
