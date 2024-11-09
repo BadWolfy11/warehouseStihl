@@ -1,6 +1,5 @@
 from pydantic import BaseModel, Field
 from enum import Enum
-from typing import Any
 import requests
 import json
 
@@ -47,6 +46,7 @@ class API:
             raise error
 
     def isJson(self, data):
+        print(f'DEBUG API.isJson: {data}')
         try:
             return json.loads(data)
         except:

@@ -5,8 +5,15 @@ from src.Api.auth import Auth
 import asyncio
 
 class LoginPage:
+    def __init__(self):
+        self.person_id = None
+        self.token = None
 
+    def get_person(self):
+        return self.person_id
 
+    def get_token(self):
+        return self.token
 
     def view(self, page:ft.page, params:Params, basket:Basket):
         def btn_click(txt_name: ft.TextField, password: ft.TextField):
@@ -29,8 +36,12 @@ class LoginPage:
                     )
 
                     if result['status'] == 200:
+                        page.client_storage.set('user_id', result['body'].get("user_id"))
+                        page.client_storage.set('person_id', result['body'].get("person_id"))
+                        page.client_storage.set('role_id', result['body'].get("role_id"))
+                        page.client_storage.set('login', result['body'].get("login"))
+                        page.client_storage.set('token', result['body'].get("access_token"))
 
-                        auth_client.token = token
                         page.go('/dashboard')
                     else:
                         password.error_text = result['body'].get("detail", "Ошибка")

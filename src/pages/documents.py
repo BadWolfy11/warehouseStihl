@@ -7,12 +7,10 @@ class DocumentsPage:
         name = ft.TextField(label="Название", filled=True, focused_color="orange")
         description = ft.TextField(label="Описание", filled=True,
                                    focused_color="orange")
-        data = ft.TextField(label="Описание", filled=True,
-                                   focused_color="orange")
         tasks_view = ft.Column()
 
         def add_clicked(e):
-            tasks_view.controls.append(ft.Checkbox(label=name.value))
+            tasks_view.controls.append(ft.Text(name.value))
             name.value = ""
             page.update()
 
