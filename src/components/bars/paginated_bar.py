@@ -1,5 +1,8 @@
 import flet as ft
+from certifi import contents
+
 from src.components.info_data import fetch_paginated_goods
+from src.components.alert_dialogs.dialog_goods import ProductManager
 
 
 class PaginatedBar:
@@ -16,7 +19,6 @@ class PaginatedBar:
             controls=[ ft.Text(f"Страница {self.current_page} из {self.total_pages}") ],
             alignment=ft.MainAxisAlignment.CENTER,
         )
-
         self.load_goods(self.current_page)
 
     def previous_page(self, e):
@@ -33,7 +35,7 @@ class PaginatedBar:
         if "error" in result:
             self.list_view.controls = [ft.Text(result["error"], color=ft.colors.RED)]
         elif result["total_pages"] < current_page:
-            # self.list_view.controls = ["Данные были обновлены, необходима перезагрузка страницы", color=ft.colors.RED)]
+            self.list_view.controls = [ft.Text(result["Данные были обновлены, необходима перезагрузка страницы"], color=ft.colors.RED)]
             pass
         else:
             self.current_page: int = current_page
@@ -43,11 +45,39 @@ class PaginatedBar:
             self.list_view.controls = []
 
             for item in result["items"]:
-                self.list_view.controls.append(ft.ListTile(title=ft.Text(f"{item['id']} - {item['name']}")))
+                edit_item = ProductManager(page=self.page, token=self.token, item_id=item["id"])
+                self.list_view.controls.append(ft.Card(
+                    content=ft.Row(
+                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                        vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                        controls=[
+                            ft.Container(
+                                content=ft.ListTile(
+                                    title=ft.Text(f"{item['id']} - {item['name']}"),
+                                    subtitle=ft.Text(item.get("description", "item['description']")),
+                                ),
+                                expand=True
+                            ),
+                            ft.Container(
+                                content=ft.IconButton(
+                                    icon=ft.icons.DONE_OUTLINE_OUTLINED,
+                                    icon_color=ft.colors.GREEN,
+                                    tooltip="Update item",
+                                    on_click=edit_item.open,
+                                    expand=True
+                                ),
+                            ),
+                        ],
+                    ),
+                    elevation=4
+                ))
+
+                self.list_view.controls.append(edit_item.dlg)
+
 
         self.update_bar()
-
         self.page.update()
+
 
     def update_bar(self):
 

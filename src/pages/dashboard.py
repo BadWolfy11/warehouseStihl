@@ -7,11 +7,39 @@ from src.Api.person import Person
 
 class DashboardPage:
     def view(self, page:ft.page, params:Params, basket:Basket):
+        person = Person(token=page.client_storage.get('token'))
+
+        def render_buttons():
+            person_id = page.client_storage.get('person_id')
+            if person_id == 1:
+                return [
+                    ft.ElevatedButton(
+                        "Пользователи",
+                        width=150,
+                        height=100,
+                        adaptive=True,
+                        content=ft.Row(
+                            [
+                                ft.Icon(name=ft.icons.INBOX_SHARP),
+                                ft.Text("Пользователи"),
+                            ],
+                            tight=True,
+                        ),
+                    ),
+                    ft.ElevatedButton("Настройки системы")
+                ]
+            elif person_id == 2:
+                return [
+                    ft.ElevatedButton("Просмотр профиля", ),
+                    ft.ElevatedButton("Мои заказы", )]
+
         def transform_date(date):
             months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
                       'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря']
             day,month, = date.split('.')
             return f'{day} {months[int(month) - 1]}'
+
+
 
         page.window.width = 1200
         page.window.height = 700
@@ -19,7 +47,7 @@ class DashboardPage:
         page.window.resizable = True
 
         person_id = page.client_storage.get('person_id')
-        person = Person(token=page.client_storage.get('token'))
+
 
         name = None
         last_name = None
@@ -42,15 +70,15 @@ class DashboardPage:
         )
         today = ft.Text("Сегодня " + transform_date(datetime.datetime.today().strftime("%d.%m")),
                         size=18)
-        goods = ft.ElevatedButton(
-            "Товары",
+        users = ft.ElevatedButton(
+            "Пользователи",
             width = 150,
             height= 100,
             adaptive=True,
             content=ft.Row(
                 [
                     ft.Icon(name=ft.icons.INBOX_SHARP),
-                    ft.Text("Товары"),
+                    ft.Text("Пользователи"),
                 ],
                 tight=True,
             ),
@@ -63,7 +91,8 @@ class DashboardPage:
                 controls=[
                     greetings,
                     today,
-                    goods
+                    *render_buttons()
+
                 ]
             )
 

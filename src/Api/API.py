@@ -46,7 +46,7 @@ class API:
             raise error
 
     def isJson(self, data):
-        print(f'DEBUG API.isJson: {data}')
+        # print(f'DEBUG API.isJson: {data}')
         try:
             return json.loads(data)
         except:
