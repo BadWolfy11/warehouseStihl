@@ -45,3 +45,10 @@ class Goods(API):
                 'attachments': attachments
             }
         )
+
+    def delete_good(self, id: int) -> dict:
+        return self.request(
+            method=RequestMethod.DELETE,
+            path=f'/api/goods/delete/{id}',
+
+        )

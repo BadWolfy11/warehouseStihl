@@ -1,14 +1,14 @@
 import flet as ft
 from flet_route import Params, Basket
 from src.components.page import generate_page
-from src.components.bars.expenses_bar import PaginatedBar
+from src.components.bars.expenses_bar import ExpensePaginatedBar
 
 class IncomePage:
     def view(self, page: ft.page, params: Params, basket: Basket):
         name = ft.TextField(label="Название", filled=True, focused_color="orange")
         description = ft.TextField(label="Описание", filled=True,
                                    focused_color="orange")
-        pagination = PaginatedBar(token=page.client_storage.get('token'), page=page, per_page=10)
+        pagination = ExpensePaginatedBar(token=page.client_storage.get('token'), page=page, per_page=10)
         tasks_view = ft.Column()
 
         def add_clicked(e):

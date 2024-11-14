@@ -1,9 +1,9 @@
 import flet as ft
 from src.components.info_data import fetch_paginated_expenses
-from src.components.alert_dialogs.dialog_goods import ProductManager
+from src.components.alert_dialogs.dialog_expenses import ExpensesManager
 
 
-class PaginatedBar:
+class ExpensePaginatedBar:
     def __init__(self, token: str, page: ft.Page, per_page: int = 10):
         self.token = token
         self.page = page
@@ -43,16 +43,49 @@ class PaginatedBar:
             self.list_view.controls = []
 
             for item in result["items"]:
+                edit_item = ExpensesManager(page=self.page, token=self.token, item_id=item["id"])
                 self.list_view.controls.append(ft.Card(
-                    content=ft.Container(
-                        content=ft.ListTile(
-                            title=ft.Text(f"{item['data']} - {item['name']}"),
-                            subtitle=ft.Text(item.get("amount", "item['amount']} рублей")),
-                        ),
-                        padding=10,
+                    content=ft.Row(
+                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                        vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                        controls=[
+                            ft.Container(
+                                content=ft.ListTile(
+                                    title=ft.Text(f"{item['data']} - {item['name']}"),
+                                    subtitle=ft.Text(item.get("amount", "item['amount']} рублей")),
+                                ),
+                                expand=True
+                            ),
+                            ft.Container(
+                                content=ft.IconButton(
+                                    icon=ft.icons.CREATE_OUTLINED,
+                                    tooltip="Update item",
+                                    on_click=edit_item.open,
+                                    expand=True
+                                ),
+                            ),
+                            ft.Container(
+                                content=ft.IconButton(
+                                    icon=ft.icons.DELETE_OUTLINE,
+                                    tooltip="Delete item",
+                                    on_click=edit_item.open_delete,
+                                    expand=True
+                                ),
+                            ),
+                        ],
                     ),
-                    elevation=4, 
+                    elevation=4
+                    # content=ft.Container(
+                    #     content=ft.ListTile(
+                    #         title=ft.Text(f"{item['data']} - {item['name']}"),
+                    #         subtitle=ft.Text(item.get("amount", "item['amount']} рублей")),
+                    #     ),
+                    #     padding=10,
+                    # ),
+                    # elevation=4,
                 ))
+                self.list_view.controls.append(edit_item.dlg)
+                self.list_view.controls.append(edit_item.dlg_modal)
                 # self.list_view.controls.append(ft.ListTile(title=ft.Text(f"{item['id']} - {item['name']}") ))
 
         self.update_bar()

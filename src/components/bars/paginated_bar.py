@@ -21,6 +21,7 @@ class PaginatedBar:
         )
         self.load_goods(self.current_page)
 
+
     def previous_page(self, e):
         if self.current_page > 1:
             self.load_goods(self.current_page - 1)
@@ -60,10 +61,17 @@ class PaginatedBar:
                             ),
                             ft.Container(
                                 content=ft.IconButton(
-                                    icon=ft.icons.DONE_OUTLINE_OUTLINED,
-                                    icon_color=ft.colors.GREEN,
+                                    icon=ft.icons.CREATE_OUTLINED,
                                     tooltip="Update item",
                                     on_click=edit_item.open,
+                                    expand=True
+                                ),
+                            ),
+                            ft.Container(
+                                content=ft.IconButton(
+                                    icon=ft.icons.DELETE_OUTLINE,
+                                    tooltip="Delete item",
+                                    on_click=edit_item.open_delete,
                                     expand=True
                                 ),
                             ),
@@ -73,6 +81,7 @@ class PaginatedBar:
                 ))
 
                 self.list_view.controls.append(edit_item.dlg)
+                self.list_view.controls.append(edit_item.dlg_modal)
 
 
         self.update_bar()

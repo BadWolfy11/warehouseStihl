@@ -1,19 +1,34 @@
+import datetime
 import flet as ft
 
-from src.Api.categories import Categories
-from src.Api.goods import Goods
+from src.Api.expense_categories import ExpenseCategories
+from src.Api.expenses import Expenses
 
 
-class ProductManager:
+class ExpensesManager:
     def __init__(self, page: ft.Page, token: str, item_id: int | None = None):
         self.page = page
-        self.API_categories = Categories(token)
-        self.goods = Goods(token)
-
+        self.API_expense_categories = ExpenseCategories(token)
+        self.expenses = Expenses(token)
+        self.info = datetime.datetime.now().strftime('%Y-%m-%d')
         self.item_id = item_id
         self.name = ft.TextField(label="Название", filled=True, focused_color="orange")
-        self.description = ft.TextField(label="Описание", filled=True, focused_color="orange")
-        self.barcode = ft.TextField(label="штрихкод", filled=True, focused_color="orange")
+        self.amount = ft.TextField(label="стоимость", filled=True, focused_color="orange")
+        self.data = ft.TextField(label="выбранная дата", filled=True, focused_color="orange")
+
+        self.date_btn =  ft.ElevatedButton(
+            "Выберите дату",
+            icon=ft.icons.CALENDAR_MONTH,
+            on_click=lambda e: self.page.open(
+                self.date_picker
+            ),
+        )
+        self.date_picker = ft.DatePicker(
+            first_date=datetime.datetime(year=2023, month=10, day=1),
+            last_date=datetime.datetime(year=2024, month=10, day=1),
+            on_change=self.date_changed
+        )
+        # self.selected_date = self.date_picker.value.strftime('%Y-%m-%d')
         self.attachments = ft.TextField(label="Дополнительно", filled=True, focused_color="orange")
 
         self.category_id = ft.Dropdown(
@@ -25,21 +40,23 @@ class ProductManager:
         self.dlg_modal = ft.AlertDialog(
             modal=True,
             title=ft.Text("Подтвердить"),
-            content=ft.Text("Вы точно хотите удалить товар?"),
+            content=ft.Text("Вы точно хотите удалить расходы??"),
             actions=[
                 ft.TextButton("Да", on_click=self.delete_item),
-                ft.TextButton("Нет", on_click=self.close),
+                ft.TextButton("Нет", on_click=self.close_delete),
             ],
             actions_alignment=ft.MainAxisAlignment.END,
-            on_dismiss= self.close
+            on_dismiss= self.close_delete
         )
 
         self.dlg = ft.AlertDialog(
-            title=ft.Text("Добавить новый товар" if self.item_id is None else "Изменить товар"),
+            title=ft.Text("Добавить новые расходы" if self.item_id is None else "Изменить расходы"),
             content=ft.Column([
                 self.name,
-                self.description,
-                self.barcode,
+                self.amount,
+                self.data,
+                self.date_btn,
+                self.date_picker,
                 self.category_id,
                 self.attachments,
                 ft.Row(
@@ -60,23 +77,30 @@ class ProductManager:
         )
 
     def delete_item(self, e):
-        delete_item =self.goods.delete_good(id=self.item_id)
+        delete_item =self.expenses.delete_expenses(id=self.item_id)
         if delete_item['status'] == 200:
-            self.page.snack_bar = ft.SnackBar(ft.Text("Товар успешно удален!"))
+            self.page.snack_bar = ft.SnackBar(ft.Text("Расходы успешно удалены!"))
             self.page.snack_bar.open = True
             self.dlg_modal.open = False
             self.page.update()
 
+    def date_changed(self, e):
+        if e.data:
+            self.data.value = f"Выбранная дата: {self.date_picker.value.strftime('%Y-%m-%d')}"
+            self.info = self.date_picker.value.strftime('%Y-%m-%d')
+            self.page.update()
 
+    # .strftime()
     def load_categories(self, e):
         try:
             offset, limit = 0, 100
             categories = []
 
             while True:
-                response = self.API_categories.all_categories(offset, limit)
+                response = self.API_expense_categories.all_expense_categories(offset, limit)
 
                 if response['status'] == 200 and not "error" in response:
+
                     items = response['body'].get("data", {})
                     categories += items
                     if response['body'].get("total_count", 0) > (offset + limit):
@@ -104,7 +128,7 @@ class ProductManager:
 
 
     def open_delete(self, e):
-        print(self.dlg_modal)
+        print(f'Open delete debug: {self.dlg_modal}')
         self.dlg_modal.open = True
 
         self.page.update()
@@ -119,61 +143,71 @@ class ProductManager:
         self.page.update()
 
     def close(self, e):
+        print(e)
         self.dlg.open = False
         self.page.update()
 
-    def add(self, e):
-        if not self.name.value or not self.description.value:
-            self.page.snack_bar = ft.SnackBar(
-                content=ft.Text("Название и описание не должны быть пустыми.", color="red")
-            )
-            self.page.snack_bar.open = True
-            self.page.update()
-            return
+    def close_delete(self, e):
+        self.dlg_modal.open = False
+        self.page.update()
 
-        result = self.goods.new_goods(
-            barcode=self.barcode.value,
+    def add(self, e):
+        # if not self.name.value or not self.amount.value or not self.info or not self.category_id.value:
+        #     self.page.snack_bar = ft.SnackBar(
+        #         content=ft.Text("Название, описание, дата и категория не должны быть пустыми.", color="red")
+        #     )
+        #     self.page.snack_bar.open = True
+        #     self.page.update()
+        #     return
+
+        result = self.expenses.new_expenses(
+            amount=int(self.amount.value) or 0,
             name=self.name.value,
-            description=self.description.value,
-            category_id=int(self.category_id.value),
+            data=self.info,
+            expense_category_id=int(self.category_id.value),
             attachments=self.attachments.value
         )
 
+        print(f'Result of add: {result}')
+
         if result['status'] == 200:
-            self.page.snack_bar = ft.SnackBar(ft.Text("Товар успешно добавлен!"))
-            self.page.snack_bar.open = True
+            self.clear_values()
+            self.close(None)
+
+            self.page.snack_bar = ft.SnackBar(ft.Text("Расходы успешно добавлены!"))
         else:
             self.page.snack_bar = ft.SnackBar(ft.Text(f"Ошибка: {result['body'].get('message', 'Неизвестная ошибка')}"))
-            self.page.snack_bar.open = True
 
-        self.clear_values()
-        self.close(None)
-        self.page.update()
+        self.page.snack_bar.open = True
+        # self.page.update()
 
     def load_item(self, item_id : int):
-        find_item = self.goods.find_good(id=item_id)
+        find_item = self.expenses.find_expenses(id=item_id)
 
         if find_item['status'] == 200:
             self.name.value = find_item['body']["name"]
-            self.description.value = find_item['body']["description"]
-            self.barcode.value = find_item['body']["barcode"]
-            self.category_id.value = str(find_item['body']["category_id"])
+            self.amount.value = find_item['body']["amount"]
+            self.data.value = find_item['body']["data"]
+            self.category_id.value = str(find_item['body']["expense_category_id"])
             self.attachments.value = find_item['body']["attachments"]
+            print(f'Load Item debug (expenses): {type(find_item['body']["data"])}')
+
 
         self.page.update()
 
     def save(self, e):
-        update_good = self.goods.update_good(
+        update_good = self.expenses.update_expenses(
             id=self.item_id,
             name=self.name.value,
-            description=self.description.value,
-            barcode=self.barcode.value,
-            category_id=self.category_id.value,
+            amount=int(self.amount.value) or 0,
+            data=self.info,
+            expense_category_id=self.category_id.value,
             attachments=self.attachments.value
+
         )
 
         if update_good['status'] == 200:
-            self.page.snack_bar = ft.SnackBar(ft.Text("Товар успешно обновлен!"))
+            self.page.snack_bar = ft.SnackBar(ft.Text("Расходы успешно обновлены!"))
             self.page.snack_bar.open = True
         else:
             self.page.snack_bar = ft.SnackBar(ft.Text("Ошибка"))
@@ -185,8 +219,15 @@ class ProductManager:
 
     def clear_values(self):
         self.name.value = ""
-        self.description.value = ""
-        self.barcode.value = ""
+        self.amount.value = ""
+        self.info = datetime.datetime.now().strftime('%Y-%m-%d')
         self.category_id.value = None
         self.attachments.value = ""
+
+        # self.name,
+        # self.amount,
+        # self.data,
+        # self.date_picker,
+        # self.attachments,
+        # self.category_id,
 

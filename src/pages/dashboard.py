@@ -72,8 +72,6 @@ class DashboardPage:
                         size=18)
         users = ft.ElevatedButton(
             "Пользователи",
-            width = 150,
-            height= 100,
             adaptive=True,
             content=ft.Row(
                 [
@@ -92,7 +90,6 @@ class DashboardPage:
                     greetings,
                     today,
                     *render_buttons()
-
                 ]
             )
 
