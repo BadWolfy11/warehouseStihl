@@ -15,8 +15,6 @@ class DashboardPage:
                 return [
                     ft.ElevatedButton(
                         "Пользователи",
-                        width=150,
-                        height=100,
                         adaptive=True,
                         content=ft.Row(
                             [
@@ -78,7 +76,6 @@ class DashboardPage:
                     ft.Icon(name=ft.icons.INBOX_SHARP),
                     ft.Text("Пользователи"),
                 ],
-                tight=True,
             ),
         )
 

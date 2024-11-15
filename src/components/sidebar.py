@@ -10,9 +10,9 @@ logotupe = ft.Container (
     content = ft.Row(
         controls = [
             ft.Image(
-                src = 'images/logo.png',
-                width = 45,
-                height = 32,
+                src = 'src/assets/images/logo.png',
+                width = 100,
+                height = 50,
                 fit = ft.ImageFit.FILL
             ),
             ft.Text(
@@ -58,18 +58,6 @@ def generate_sidebar(page: ft.page):
                     style=style_menu,
                     on_click=lambda e: page.go("/expenses")
                 ),
-                ft.TextButton(
-                    'Поступления',
-                    icon='CALL_MADE_OUTLINED',
-                    style=style_menu,
-                    on_click=lambda e: page.go("/income")
-                ),
-                ft.TextButton(
-                    'Продажи',
-                    icon='CALL_RECEIVED_OUTLINED',
-                    style=style_menu,
-                    on_click=lambda e: page.go("/outcome")
-                )
             ]
 
         )
