@@ -16,7 +16,7 @@ logotupe = ft.Container (
                 fit = ft.ImageFit.FILL
             ),
             ft.Text(
-                'STIHL Склад',
+                'STIHL Учет магазина',
                 expand = True,
                 color = "orange",
                 size = 20

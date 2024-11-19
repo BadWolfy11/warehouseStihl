@@ -5,6 +5,7 @@ from src.pages.dashboard import DashboardPage
 from src.pages.goods import GoodsPage
 from src.pages.documents import DocumentsPage
 from src.pages.expenses import ExpensesPage
+from src.pages.role import RolePage
 
 
 class Router:
@@ -16,6 +17,9 @@ class Router:
             path(url='/goods', clear = False, view = GoodsPage().view),
             path(url='/documents', clear=False, view=DocumentsPage().view),
             path(url='/expenses', clear=False, view=ExpensesPage().view),
+            path(url='/role', clear=False, view=RolePage().view),
+            path(url='/users', clear=False, view=ExpensesPage().view),
+            path(url='/expense_categories', clear=False, view=ExpensesPage().view),
 
         ]
 

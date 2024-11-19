@@ -20,11 +20,40 @@ class DashboardPage:
                             [
                                 ft.Icon(name=ft.icons.INBOX_SHARP),
                                 ft.Text("Пользователи"),
+
                             ],
                             tight=True,
+
                         ),
+                        on_click=lambda e: page.go("/role")
                     ),
-                    ft.ElevatedButton("Настройки системы")
+                    ft.ElevatedButton(
+                        "Роли пользователей",
+                        adaptive=True,
+                        content=ft.Row(
+                            [
+                                ft.Icon(name=ft.icons.PERSON_ADD_ALT_OUTLINED),
+                                ft.Text("Роли пользователей"),
+                            ],
+                            tight=True,
+
+                        ),
+                        on_click=lambda e: page.go("/role")
+                    ),
+
+                    ft.ElevatedButton(
+                        "Виды затрат",
+                        adaptive=True,
+                        content=ft.Row(
+                            [
+                                ft.Icon(name=ft.icons.TYPE_SPECIMEN),
+                                ft.Text("Виды затрат"),
+                            ],
+                            tight=True,
+
+                        ),
+                        on_click=lambda e: page.go("/expense_categories")
+                    ),
                 ]
             elif person_id == 2:
                 return [

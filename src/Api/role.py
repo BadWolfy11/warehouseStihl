@@ -4,20 +4,20 @@ class Role(API):
     def __init__(self, token: str | None):
         super().__init__(token)
 
-    def all_roles(self, offset: int, limit: int) -> dict:
+    def all_roles(self, page: int, itemsPerPage: int) -> dict:
         return self.request(
             method=RequestMethod.GET,
-            path='/api/roles/get_multi',
+            path='/api/role/get_paginated',
             params={
-                'offset': offset,
-                'limit': limit
+                'page': page,
+                'itemsPerPage': itemsPerPage
             }
         )
 
     def new_roles(self, name: str) -> dict:
         return self.request(
             method=RequestMethod.POST,
-            path='/api/roles/create',
+            path='/api/role/create',
             json={
                 'name': name,
             }
@@ -26,14 +26,14 @@ class Role(API):
     def find_roles(self, id: int) -> dict:
         return self.request(
             method=RequestMethod.GET,
-            path=f'/api/roles/get/{id}',
+            path=f'/api/role/get/{id}',
         )
 
     def update_roles(self, id: int, data: str | None = None, name: str | None = None) -> dict:
         print(data)
         return self.request(
             method=RequestMethod.PATCH,
-            path=f'/api/roles/update/{id}',
+            path=f'/api/role/update/{id}',
             json={
                 'name': name
             }
@@ -42,6 +42,6 @@ class Role(API):
     def delete_roles(self, id: int) -> dict:
         return self.request(
             method=RequestMethod.DELETE,
-            path=f'/api/roles/delete/{id}',
+            path=f'/api/role/delete/{id}',
 
         )
